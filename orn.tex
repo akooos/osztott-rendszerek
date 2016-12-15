@@ -1,4 +1,4 @@
-\documentclass[twoside, a4paper, 12pt]{article}
+\documentclass[12pt]{article}
 \usepackage{t1enc}
 \usepackage[utf8x]{inputenc}
 %\usepackage[latin2]{inputenc} % ha a forrásszöveg iso8859-2 kódolású
@@ -16,8 +16,25 @@
     inner=3.5cm,
     outer=2.5cm
 ]{geometry}
-\usepackage{epstopdf}
+%\usepackage{epstopdf}
 \usepackage{enumitem}
+\usepackage[T1]{fontenc}
+\usepackage{ae,aecompl}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[a4paper]{geometry}
+\usepackage{xcolor}
+\usepackage{siunitx}
+\usepackage{cleveref}
+\usepackage[unicode, colorlinks=false, pdfborder={0 0 0}]{hyperref}
+\usepackage{booktabs}
+% bcs i am a fascist deep inside:
+\usepackage{times} % Uncomment to use the Times New Roman font
+\usepackage{microtype} % This should be the last one!
+\usepackage{parskip}
+\usepackage{pifont}
+\usepackage{dsfont}
 \def\DocTitle{Osztott rendszerek jegyzet}
 \def\DocAuthor{Tóth Ákos}
 \def\CurrentDate{2016}
@@ -28,42 +45,9 @@
 \sloppy
 \widowpenalty=30000
 \clubpenalty=30000
-\lstset{
-    basicstyle=\small\ttfamily,
-    frame=l,
-    xleftmargin=\parindent,
-    tabsize=2,
-    prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
-    breaklines=true,
-    breakatwhitespace=true,
-    escapeinside={@}{@} 
-}
-\newenvironment{Myitemize}[1][]{%
-    \renewcommand{\MyItem}{%
-        \iftoggle{FirstItem}{%
-            \global\togglefalse{FirstItem}
-            \setlength{\currentparskip}{\parskip}% save the value
-            %--------- start new minipage
-            \par\addvspace{\baselineskip}\noindent
-            \begin{minipage}{\textwidth}%
-                \setlength{\parskip}{\currentparskip}% restore the value
-                \begin{itemize}[#1,series=MySeries]%
-                    }{%
-            \end{itemize}%
-        \end{minipage}%
-        %--------- end previous minipage and start new one
-        \par\addvspace{\baselineskip}\noindent
-        \begin{minipage}{\textwidth}%
-            \setlength{\parskip}{\currentparskip}% restore the value
-            \begin{itemize}[#1,resume*=MySeries]%
-            }%
-        \item\mbox{}%
-        }%
-        }{%
-\end{itemize}%
-        \end{minipage}% --------- end last minipage
-        \global\toggletrue{FirstItem}%
-    }%
+\setlength{\parindent}{1.2em}
+\setlength{\parskip}{1.0em}
+\renewcommand{\baselinestretch}{1.0}
     \title{\DocTitle}
     \author{\DocAuthor}
     \date{\CurrentDate}
@@ -111,10 +95,8 @@
     \begin{description}
         \item[Egy-egy mondattal jellemezz kétfajta (nem rokon jellegű)
             átlátszóságot.]
-            \hfill
             \includegraphics[scale=0.5]{images/P5.PNG}
         \item[Mi jellemzi a nyitott rendszereket?]
-            \hfill
             \begin{itemize}
                 \item jól definiált interface-kel rendelkeznek 
                 \item Az alkalmazások hordozhatóságát minél inkább
@@ -169,18 +151,14 @@
         \item[Miben hasonlítanak és miben térnek el a cluster és a grid
             rendszerek?]
             \hfill
-            \resizebox{0.99\textwidth}{!}{
-                \begin{minipage}{\textwidth}
                     \begin{tabular}{c c c}
-                        Cluster & | & Grid\\
+                        Clustera & | & Grid\\
                         \hline
                         &elosztott számítási rendszer&\\
                         lokális hálózat&&nagyméretű hálózat\\
                         központosított vezérlés&&átívelhet több szervezeti egységen\\
                         homogén számítógépek&&több, kevésbé egységes számítógép\\
                     \end{tabular}
-                \end{minipage}
-            }
         \item[Mi az ACID (Legalább két szempont részletezve, a másik kettőnek legalább a neve)?]
             \hfill
             Tranzakcióknál használt követelményrendszer:
