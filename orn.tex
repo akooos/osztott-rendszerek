@@ -10,11 +10,11 @@
 \usepackage[usenames, dvipsnames]{color}
 \usepackage{parskip}
 \usepackage[
-    a4paper,
-    top=2.5cm,
-    bottom=2.5cm,
-    inner=3.5cm,
-    outer=2.5cm
+a4paper,
+top=2.5cm,
+bottom=2.5cm,
+inner=3.5cm,
+outer=2.5cm
 ]{geometry}
 %\usepackage{epstopdf}
 \usepackage{enumitem}
@@ -95,16 +95,37 @@
 \begin{description}
     \item[Elosztott rendszer:] Önálló számítógépek olyan összessége, amely kezelői számára egyetlen koherens rendszernek tűnik.
     \item[Nyitott elosztott rendszer:] A nyitott elosztott rendszer képes más nyitott rendszerek számára szolgáltatásokat nyújtani, és azok szolgáltatásait igénybe venni.  Jellemző tulajdonságai, hogy jól definiált interface-el rendelkezik, valamilyen szintű hordozhatóság(\textit{portability}) és együttműködési (\textit{interoperability}) (más rendszerekkel), támogatása. 
-    \item [P2P Overlay network] Egy peer-to-peer overlay network egy számítógépes hálózat, amelyet valamilyen meglévő hálózatra építenek fel, általában az Internetre. Peer to peer overlay hálózatok előnye skálázhatóság, megbízhatóság; szemben a tradicionális kliens-szerver rendszerekkel. Legtöbbször fájl megosztás illetve valós idejű adat folyamoknál használják.
+    \item [P2P Overlay network:] Egy peer-to-peer overlay network egy számítógépes hálózat, amelyet valamilyen meglévő hálózatra építenek fel, általában az Internetre. Peer to peer overlay hálózatok előnye skálázhatóság, megbízhatóság; szemben a tradicionális kliens-szerver rendszerekkel. Legtöbbször fájl megosztás illetve valós idejű adat folyamoknál használják.
+    \item [Köztes réteg:] Olyan szolgáltatásokat és protokollokat lehet sorolni, amely sokfajta alkalmazáshoz lehetnek hasznosnak.
+        \begin{itemize}
+            \item kommunikációs protokollok
+            \item sorosítás(serialization,marshalling)
+            \item skálázási mechanizmusok(replikáció,cache-elés)
+            \item biztonsági protokollok
+            \item elnevezési protokollok, az erőforrások megosztására
+        \end{itemize}
+    \item[Megtartó kommunikáció:] A rendszer hajlandó huzamosabb ideig megtartani az üzeneteket.
+    \item[Időleges kommunikáció:] A kommunikációs rendszer elveti az üzenetet, ha az nem kézbesíthető.
+    \item[Kliens-szerver modell:] A kliens-szerver modell jellemzően \textit{időleges(transient), szinkron} kommunikációt használ. A kliensnek és a szervernek egyidőben kell aktívnak lennie. A kliens a kérések elindítása után blokkolódik, amíg választ nem kap a szervertől. A szerver a kliensek fogadásával és kiszolgálásával foglalkozik.
+    \item[Üzenetorientált köztesréteg(MOM):] Message Oriented Middleware. \textit{Megtartó(persistent), aszinkron} kommunikációs forma. Segítségével a folyamatok üzeneteket küldhetnek egymásnak. A küldő félnek nem kell válaszra várni, foglalkozhat mással. Gyakran jobb hibatűrést biztosít. \\\textit{Működési elv:}A köztesréteg sorokat(queue) tart fenn a rendszer gépein. A kliensek az alábbi műveletek használják a várakozási sorokra:
+        \begin{description}
+            \item[PUT:] Üzenetet tesz egy várakozási sor végégre.
+            \item[GET:] Blokkol, amíg a sor üres, majd leveszi az első üzenetet.
+            \item[POLL:] Nem blokkoló módon lekérdezi van-e üzenet, ha igen leveszi az elsőt.
+            \item[NOTIFY:] Kezelőrutint telepít a várakozási sorhoz, amely minden beérkező üzenetre meghívódik.
+        \end{description}
+        \textit{Üzenetkezelő rendszerek homogenitása:} Az üzenet kezelő rendszerek feltételezik, hogy a rendszer minden eleme közös protokollt használ, azaz az üzenetek szerkezete és adatábrázolása megegyező.
+        \\\textit{Üzenet közvetítő (message broker):} Olyan központi komponenes, amely heterogén környezetben gondoskodik a megfelelő konverzióról: Átalakítja az üzeneteket a fogadó formátumára, illetve szerepe szerint átjáró(application level gateway, proxy), továbbá egyéb funkciókat is ellát(pl.: biztonsági); az üzenetek tartalmát is megvizsgálhatják az útválasztáshoz(Subject based vs Object based routing) ⇒ Enterprise Application Integration.
+\item[Távoli eljáráshívás(RPC):] A Remote Procedure Call vagy az alprogramok használata természetes a fejlesztés során, amelyek a jó esetben egymástól függetlenül működnek("fekete doboz"), ezáltal akár távoli gépeken is futtathatjuk. A távoli gépen futtatandó eljárás eléréséhez kommunikációra van szükség, ezt eljáráshívási mechanizmus fedi el.\\RPC hívás lépései:\\\begin{enumerate}\item A kliensfolyamat lokálisan meghívja a klienscsonkot\item A klienscsonk becsomagolja az eljárás azonosítóját és paramétereit, meghívja az OS-t.\item A helyi OS átküldi a távoli OS-nek.\item Távoli OS átadja az üzenetet a szervercsonknak. \item A szervercsonk kicsomagolja a paramétereket és átadja a szervernek.\item A szerver lokálisan meghívja az eljárást, majd megkapja a visszatérési értéket. Ennek visszaküldése a kliensben hasonlóan zajlik, fordított irányban.\end{enumerate}Mivel az elosztott rendszer résztvevőinek adatábrázolása különböző lehet, ezért az adatok sorosítása során(serializing, marshaling) közös formátumra alakítjuk az adatokat; a csonkok fordítanak a közös formátum és a helyi adatábrázolás között.\\Paraméterátadás történhet érték-eredmény szerint: Minden feldolgozandó adat paraméterként kerül az eljárásba, nincsen globális hivatkozás. Nem érhető el teljes mértékű átlátszóság. Az átlátszóság növelése a \textit{Távoli hivatkozások} segítségével történhet: A távoli adat egységesen érhető el; a hivatkozás paraméterként átadható az RPC hívásban.\\\textit{Aszinkron RPC:} A szerver nyugtázza a kérés beérkezését, a kliens nem várakozik az eredményre.\\\textit{Késleltetett, szinkronizált RPC:}Két aszinkron RPC hívás egymással összehangolva: Kliens elküldi a kérést, várakozik a szerver nyugtájáig. Ha a szerveren az eljárás hívás megtörtént, a szerver elküldi az adatok egy egyirányú aszinkron RPC hívással a kliensnek. További lehetőség, hogy az RPC hívás után, a kliens időnként lekérdezi a szervert a hívás állapotáról és az eredményekről.\\\textit{Kliens csatlakozása a szerverhez:}\begin{enumerate}\item A szolgáltatások katalógusba jegyzik be, hogyan érhetőek el, globálisan és lokálisan is.\item A kliens kikeresi a szolgáltatást a katalógusból.\item A kliens végpontot igényel a démontól a kommunikációhoz.\end{enumerate}
 \end{description}
 \section{Kérdések és válaszok}
 \subsection{Rövid kérdések}
 1. diasor
-\begin{description}
+\begin{description}[style=unboxed]
     \item[Egy-egy mondattal jellemezz kétfajta (nem rokon jellegű)
         átlátszóságot.]
         \includegraphics[scale=0.5]{images/P5.PNG}
-    \item[Mi jellemzi a nyitott rendszereket?]
+    \item[Mi jellemzi a nyitott rendszereket?]\hfill\\
         \begin{itemize}
             \item jól definiált interface-kel rendelkeznek 
             \item Az alkalmazások hordozhatóságát minél inkább
@@ -190,7 +211,7 @@
         \end{itemize}
 \end{description}
 2. diasor
-\begin{description}
+\begin{description}[style=unboxed]
     \item [Írd le az egyszerű kliens-szerver modellben a kommunikáció menetét.]
         \hfill
         \begin{enumerate}
@@ -225,67 +246,68 @@
             \item [selectToSend:] Az általa ismert szomszédok közül kiválaszt n darabot.
             \item [selectToKeep:] A megkapott csúcsokat eltárolja lokálisan. Eltávolítja a többszörösen szereplő csúcsokat. A tárolt csúcsok számát m darabra csökkenti. Erre többfajta stratégia lehetséges.
         \end{description}
-\item [Hogyan működnek a struktúrálatlan peer-to-peer rendszerek?]
-    \hfill \\
-    Ezek a rendszerek igyekeznek véletlen gráf struktúrát fenntartani. Mindegyik csúcsnak csak részleges nézete van a gráfról.\\Minden P csúcs időközönként kiválaszt egy szomszédos Q csúcsot - P és Q információt cserél, valamint átküldik egymásnak az általuk ismert csúcsokat
+    \item [Hogyan működnek a struktúrálatlan peer-to-peer rendszerek?]
+        \hfill \\
+        Ezek a rendszerek igyekeznek véletlen gráf struktúrát fenntartani. Mindegyik csúcsnak csak részleges nézete van a gráfról.\\Minden P csúcs időközönként kiválaszt egy szomszédos Q csúcsot - P és Q információt cserél, valamint átküldik egymásnak az általuk ismert csúcsokat
     \item [Mi a superpeer? Egy-két mondattal jellemezz olyan rendszert, amelyben megtalálható.]
-        \hfill Olyan kisszámú csúcs, amelyeknek külön feladata van.\\- kereséshez index fenntartása\\- a hálózat állapotának felügyelete\\- csúcsok közötti kapcsolatok létrehozása\\Példa:\\- kliens-szerver + P2P: BitTorrent hibrid architektúrában a tracker, amely az egyes peer-ek, megosztásait figyeli (indexeli Pl.: feltöltési sebesség alapján).\\- kliens-szerver + P2P: Edge szerver hibrid architektúrában a CDN rendszerekben az Information Broker-ek figyelemmel kísérik a hálózatot és a kliensek kéréseit, amiket a nekik legmegfelelőbb edge szerverhez irányítják.
-\item [Mi az interceptor?]
-    \hfill \\
-    \textit{Távoli objektum} elérése során a vezérlés szokásos menetébe avatkozik bele. Pl.: átalakíthatja más formátumra a kérést. Jellemzően az architektúra rétegei közé illeszthető.
-\item [Milyen az önszervező rendszerek általános architektúrája?]
-    \hfill \\elvárható tulajdonságok:
-    \begin{itemize}
-        \item önkonfiguráló
-        \item önkezelő
-        \item öngyógyító
-        \item ön optimalizáló
-        \item ön*
-    \end{itemize}
+        \hfill\\Olyan kisszámú csúcs, amelyeknek külön feladata van.\\- kereséshez index fenntartása\\- a hálózat állapotának felügyelete\\- csúcsok közötti kapcsolatok létrehozása\\Példa:\\- kliens-szerver + P2P: BitTorrent hibrid architektúrában a tracker, amely az egyes peer-ek, megosztásait figyeli (indexeli Pl.: feltöltési sebesség alapján).\\- kliens-szerver + P2P: Edge szerver hibrid architektúrában a CDN rendszerekben az Information Broker-ek figyelemmel kísérik a hálózatot és a kliensek kéréseit, amiket a nekik legmegfelelőbb edge szerverhez irányítják.
+    \item[Mi az interceptor?]
+        \hfill\\
+        \textit{Távoli objektum} elérése során a vezérlés szokásos menetébe avatkozik bele. Pl.: átalakíthatja más formátumra a kérést. Jellemzően az architektúra rétegei közé illeszthető.
+    \item [Milyen az önszervező rendszerek általános architektúrája?]
+        \hfill \\elvárható tulajdonságok:
+        \begin{itemize}
+            \item önkonfiguráló
+            \item önkezelő
+            \item öngyógyító
+            \item ön optimalizáló
+            \item ön*
+        \end{itemize}
     \item [Mi az az edge server?]
-    \hfill \\Az adatokat tároló szerver. A kliensekhez minél közelebb van elhelyezve, ahol egy nagyobb hálózat az Internetre csatlakozik.
-\item [Mi az a  Content Delivery Network?]
-    \hfill \\Tartalom szolgáltató hálózat. A tartalom szolgáltatás hatékonyságát növelik és költségét csökkentik.
-\item [Adj módszert arra, hogyan válasszuk meg, melyik szerverek tároljanak egy adott fájlt!]
-    \hfill \\Visszacsatolásos modell:Mérik, hogy a rendszer mennyire tér el a kívánt tulajdonságoktól, és szükség szerint változtatnak a beállításokon. ⇒ Például Globule
+        \hfill \\Az adatokat tároló szerver. A kliensekhez minél közelebb van elhelyezve, ahol egy nagyobb hálózat az Internetre csatlakozik.
+    \item [Mi az a Content Delivery Network?]
+        \hfill \\Tartalom szolgáltató hálózat. A tartalom szolgáltatás hatékonyságát növelik és költségét csökkentik.
+    \item [Adj módszert arra, hogyan válasszuk meg, melyik szerverek tároljanak egy adott fájlt!]
+        \hfill \\Visszacsatolásos modell:Mérik, hogy a rendszer mennyire tér el a kívánt tulajdonságoktól, és szükség szerint változtatnak a beállításokon. ⇒ Például Globule
     \item Globule (CDN)\\
         - tartalmakat költségmodell alapján helyezi el\\
         - A központi szerver elemzi, hogy mi történt volna, ha P oldalt az S edge szerver tárolta volna.\\
         A számításokat különböző stratégiákra végzi el, végül a legjobbat választja ki.\\
-       \begin{center}
-           \includegraphics[scale=0.9]{./images/Globule.png}
-       \end{center}
-    \hfill
+        \begin{center}
+            \includegraphics[scale=0.9]{./images/Globule.png}
+        \end{center}
+        \hfill
+\end{description}
 3. diasor
+\begin{description}[style=unboxed]
     \item [Mi a kontextusváltás?]
         \hfill \\ A másik folyamatnak/szálnak történő vezérlésátadás, illetve a megfelelő kontextusok cseréje. Így egy processzor több folyamatot/szálat is végre tud hajtani.
-    \item [Milyen két fő megközelítés létezik a virtualizációra? Az egyik rövid jellemzésével.]
-    \begin{description}
-        \item [Process VM:] A virtuális program közönséges programként fut ⇒ bytecode-ot hajt végre Pl.: JVM, CLR
-        \item [VM Monitor:] Hardver teljes körű virtualizációja ⇒ bármely operációs rendszer futtatására alkalmas Pl.: VirtualBox
-    \end{description}
-\item [Mi a szuperszerver?]
-    \hfill \\ Olyan szerver, amelyik több port-on figyeli a bejövő kapcsolatokat, és amikor új kérés érkezik, új folyamatot/szálat indít annak kezelésére.
-\item [Mi a iteratív és konkurens szerver?]
-    \begin{description}
-        \item [Iteratív:] Egyszerre csak egy kapcsolatot tud kezelni
-    \item [Konkurens:] Párhuzamosan több kapcsolatot is tud kezelni
-    \end{description}
-    \item  Mi jellemzi az állapot teljes szervereket?
-    \item Állapotot tart számon a klienstől
-        - Megjegyzi, melyik fájlokat használta a kliens, és ezeket előre megtudja nyitni legközelebb
-        - Megjegyzi, milyen adatokat töltött le a kliens, és frissítéseket küldhet neki
-    \item  Mi a kódmigráció?
-    \item olyan kommunikáció, amely során nem csak adatokat küldünk át
-    \item  Nevezz meg legalább kétfajta feladatot, amely során kódmigráció történik, és részletezd az egyiket.
-    \item Client-Server
-        - a szokásos kliens-szerver kommunikáció, nincsen kódmigráció
-    \item Remote Evaluation 
-        - a kliens feltölti a kódot, és a szerveren futtatja
-    \item Code on Demand 
-        - a kliens letölti a kódot a szerverről, és helyben futtatja
-    \item Mobile Agent 
-        - a mobil ágens feltölti a kódját és az állapotát, és a szerveren folytatja a futását
+    \item [Milyen két fő megközelítés létezik a virtualizációra? Az egyik rövid jellemzésével.]\hfill\\
+        \begin{description}
+            \item [Process VM:] A virtuális program közönséges programként fut ⇒ bytecode-ot hajt végre Pl.: JVM, CLR
+            \item [VM Monitor:] Hardver teljes körű virtualizációja ⇒ bármely operációs rendszer futtatására alkalmas Pl.: VirtualBox
+        \end{description}
+    \item [Mi a szuperszerver?]
+        \hfill\\Olyan szerver, amelyik több port-on figyeli a bejövő kapcsolatokat, és amikor új kérés érkezik, új folyamatot/szálat indít annak kezelésére.
+    \item [Mi a iteratív és konkurens szerver?]
+        \hfill
+        \begin{description}
+            \item [Iteratív:]Egyszerre csak egy kapcsolatot tud kezelni
+            \item [Konkurens:]Párhuzamosan több kapcsolatot is tud kezelni
+        \end{description}
+    \item [Mi jellemzi az állapot teljes szervereket?]
+        \hfill\\ Állapotot tart számon a klienstől: megjegyzi, melyik fájlokat használta a kliens, és ezeket előre megtudja nyitni legközelebb; illetve eltárolja milyen adatokat töltött le a kliens, és frissítéseket küldhet neki
+    \item [Mi a kódmigráció?]
+        \hfill\\
+        Olyan kommunikáció, amely során nem csak adatokat küldünk át
+    \item [Nevezz meg legalább kétfajta feladatot, amely során kódmigráció történik, és részletezd az egyiket.]
+        \hfill
+        \begin{description}
+            \item [Client-Server:]A szokásos kliens-szerver kommunikáció, nincsen kódmigráció
+            \item [Remote Evaluation:]A kliens feltölti a kódot, és a szerveren futtatja
+            \item [Code on Demand:]A kliens letölti a kódot a szerverről, és helyben futtatja
+            \item [Mobile Agent:]A mobil ágens feltölti a kódját és az állapotát, és a szerveren folytatja a futását
+        \end{description}
     \item  Mik az objektum komponensek?
     \item Kódszegmens  ⇒ a programkódot tartalmazza
     \item Adatszegmens ⇒ a futó program állapotát tartalmazza
